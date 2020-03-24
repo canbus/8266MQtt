@@ -273,7 +273,6 @@ uart0_rx_intr_handler(void *para)
         WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_RXFIFO_OVF_INT_CLR);
         DBG1("RX OVF!!\r\n");
     }
-
 }
 
 /******************************************************************************
@@ -295,6 +294,13 @@ uart_test_rx()
 }
 #endif
 
+
+UART_RX_Callback rx_CallBack=NULL;
+void UART_RX_CallBack_Register(UART_RX_Callback callBack)
+{
+	rx_CallBack = callBack;
+}
+
 LOCAL void ICACHE_FLASH_ATTR ///////
 uart_recvTask(os_event_t *events)
 {
@@ -306,13 +312,20 @@ uart_recvTask(os_event_t *events)
         uint8_t d_tmp = 0;
         uint8_t idx = 0;
 
+        uint8_t rx_data[fifo_len];
         for (idx = 0; idx < fifo_len; idx++) {
             d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
-            uart_tx_one_char(UART0, d_tmp);
+            //uart_tx_one_char(UART0, d_tmp);
+            rx_data[idx] = d_tmp;
         }
+        rx_data[idx] = 0;
 
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
         uart_rx_intr_enable(UART0);
+        if(rx_CallBack == NULL)
+        	os_printf("rx_CallBack is NULL");
+        else
+        	rx_CallBack(rx_data, fifo_len);
 #endif
     } else if (events->sig == 1) {
 #if UART_BUFF_EN
@@ -325,7 +338,7 @@ uart_recvTask(os_event_t *events)
 }
 
 void ICACHE_FLASH_ATTR
-uart_init(UartBautRate uart0_br, UartBautRate uart1_br)
+uart_init(UartBautRate uart0_br, UartBautRate uart1_br ,UART_RX_Callback callBack)
 {
     /*this is a example to process uart data from task,please change the priority to fit your application task if exists*/
     system_os_task(uart_recvTask, uart_recvTaskPrio, uart_recvTaskQueue, uart_recvTaskQueueLen);  //demo with a task to process the uart data
@@ -335,7 +348,8 @@ uart_init(UartBautRate uart0_br, UartBautRate uart1_br)
     UartDev.baut_rate = uart1_br;
     uart_config(UART1);
     ETS_UART_INTR_ENABLE();
-
+    rx_CallBack = callBack;
+    os_printf("rx_CallBack ok");
 #if UART_BUFF_EN
     pTxBuffer = Uart_Buf_Init(UART_TX_BUFFER_SIZE);
     pRxBuffer = Uart_Buf_Init(UART_RX_BUFFER_SIZE);
@@ -364,7 +378,7 @@ uart_init(UartBautRate uart0_br, UartBautRate uart1_br)
 void ICACHE_FLASH_ATTR
 uart_reattach()
 {
-    uart_init(BIT_RATE_115200, BIT_RATE_115200);
+    uart_init(BIT_RATE_115200, BIT_RATE_115200,NULL);
 }
 
 /******************************************************************************

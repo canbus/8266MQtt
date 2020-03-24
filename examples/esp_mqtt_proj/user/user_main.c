@@ -175,11 +175,11 @@ void user_init(void)
 
     CFG_Load();
 
-    MQTT_InitConnection(&mqttClient, sysCfg.mqtt_host, sysCfg.mqtt_port, sysCfg.security);
-    //MQTT_InitConnection(&mqttClient, "192.168.11.122", 1880, 0);
+    //MQTT_InitConnection(&mqttClient, sysCfg.mqtt_host, sysCfg.mqtt_port, sysCfg.security);
+    MQTT_InitConnection(&mqttClient, "192.168.43.195", 1883, 0)
 
-    MQTT_InitClient(&mqttClient, sysCfg.device_id, sysCfg.mqtt_user, sysCfg.mqtt_pass, sysCfg.mqtt_keepalive, 1);
-    //MQTT_InitClient(&mqttClient, "client_id", "user", "pass", 120, 1);
+    //MQTT_InitClient(&mqttClient, sysCfg.device_id, sysCfg.mqtt_user, sysCfg.mqtt_pass, sysCfg.mqtt_keepalive, 1);
+    MQTT_InitClient(&mqttClient, "client_id", "user", "pass", 120, 1);
 
     MQTT_InitLWT(&mqttClient, "/lwt", "offline", 0, 0);
     MQTT_OnConnected(&mqttClient, mqttConnectedCb);
@@ -187,7 +187,8 @@ void user_init(void)
     MQTT_OnPublished(&mqttClient, mqttPublishedCb);
     MQTT_OnData(&mqttClient, mqttDataCb);
 
-    WIFI_Connect(sysCfg.sta_ssid, sysCfg.sta_pwd, wifiConnectCb);
+    //WIFI_Connect(sysCfg.sta_ssid, sysCfg.sta_pwd, wifiConnectCb);
+    WIFI_Connect("Qwer1", "b12345678", wifiConnectCb);
 
     INFO("\r\nSystem started ...\r\n");
 }
