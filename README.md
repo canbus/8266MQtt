@@ -1,3 +1,24 @@
+**本地Mqtt测试**
+WIFIConfig;ssid;12345678;endl;
+MQTTHostConfig;192.168.43.195;1883;0;endl;  <--不加密
+MQTTClientCfg;myclient_id:admin;public;endl;
+
+publish;/mqtt/mytopic/0:hello;0;0;endl;
+subscribe;/mqtt/mytopic/0;0;endl;
+
+subscribe;/mqtt/mytopic/1;1;endl;
+publish;/mqtt/mytopic/1;hello;1;0;endl;
+
+**阿里物联网Mqtt接入**
+WIFIConfig;ssid;12345678;endl;
+MQTTHostConfig;a1enYbL9dlS.iot-as-mqtt.cn-shanghai.aliyuncs.com;1883;0;endl;
+MQTTClientCfg;001|securemode=3,signmethod=hmacsha1|;Port1&a1enYbL9dlS;F9A79B92DE6519131B92E2FCA758BB7569E724;endl;
+
+subscribe;/a1enYbL9dlS/Port1/user/get;endl;
+publish;/sys/a1enYbL9dlS/Port1/thing/event/property/post;{\"id\":\"230788029\",\"method\":\"thing.event.property.post\",\"params\":{\"Status\":1,\"Data\":\"Hello\",\"RemainParkSpace\":12,\"V\":230},\"version\":\"1.0\"};endl;
+
+
+
 # Support Policy for ESP8266 NonOS
 
 Starting from December 2019, 
